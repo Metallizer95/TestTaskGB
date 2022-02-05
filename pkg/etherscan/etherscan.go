@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 )
 
 // TODO: Create config struct and config file
@@ -17,8 +18,8 @@ const (
 )
 
 type Etherscan interface {
-	GetLastBlockTag() (string, error)
-	GetBlockByTag(tag string) (EthModel, error)
+	GetLastBlockTag() (int64, error)
+	GetBlockByTag(tag int64) (EthModel, error)
 }
 
 type addressParameters struct {
@@ -47,33 +48,38 @@ func New() Etherscan {
 	}
 }
 
-func (e etherscan) GetLastBlockTag() (string, error) {
+func (e etherscan) GetLastBlockTag() (int64, error) {
 	e.params.action = LastBlockTagAction
 
 	address := e.getRequestAddress()
 	resp, err := http.Get(address)
 	if err != nil {
-		return "", err
+		return 0, err
 	}
 	defer resp.Body.Close()
 
 	rawDataFromHttp, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return "", err
+		return 0, err
 	}
 
 	var responseModel LastTagModel
 	err = json.Unmarshal(rawDataFromHttp, &responseModel)
 	if err != nil {
-		return "", err
+		return 0, err
 	}
 
-	return responseModel.Tag, nil
+	tagInt, err := strconv.ParseInt(responseModel.Tag[2:], 16, 64)
+	if err != nil {
+		return 0, err
+	}
+
+	return tagInt, nil
 }
 
-func (e etherscan) GetBlockByTag(tag string) (EthModel, error) {
+func (e etherscan) GetBlockByTag(tag int64) (EthModel, error) {
 	e.params.action = BlockByTagAction
-	e.params.tag = tag
+	e.params.tag = "0x" + strconv.FormatInt(tag, 16)
 
 	address := e.getRequestAddress()
 	fmt.Println(address)

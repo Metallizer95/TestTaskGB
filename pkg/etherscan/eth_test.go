@@ -10,7 +10,7 @@ func TestGetLastTag(t *testing.T) {
 	eth := New()
 	lastTag, err := eth.GetLastBlockTag()
 	assert.NoError(t, err)
-	assert.NotEqual(t, "", lastTag)
+	assert.NotEqual(t, 0, lastTag)
 	fmt.Println(lastTag)
 }
 

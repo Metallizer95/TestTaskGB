@@ -1,11 +1,12 @@
 package main
 
+import (
+	"fmt"
+	"github.com/Metallizer95/TestTaskGB/internal/usecases"
+)
+
 func main() {
+	ucs := usecases.New()
+	res, _ := ucs.FindMaxBalanceWalletForLastBlocks(20)
+	fmt.Println(res)
 }
-
-// TODO: Create plan and design structure of project
-// TODO: Create transaction domain
-// TODO: Describe interface of domain (Dependency inversion)
-
-// TODO: Investigate API of etherscan.io
-// TODO: Write pkg-module to work with etherscan.io
