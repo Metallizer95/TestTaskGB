@@ -9,6 +9,10 @@ type WalletBalanceModel struct {
 	Value   float64
 }
 
-type ErrModel struct {
-	Msg string
+type ErrorModel struct {
+	Errs []error
+}
+
+func (em *ErrorModel) Append(err error) {
+	em.Errs = append(em.Errs, err)
 }

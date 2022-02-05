@@ -6,8 +6,13 @@ import (
 	"testing"
 )
 
+// Do not use api key in tests, so may occurred error related with limit of requests
+
 func TestGetLastTag(t *testing.T) {
-	eth := New()
+	eth := New(Config{
+		RootAddress: "https://api.etherscan.io/api",
+		Module:      "proxy",
+	})
 	lastTag, err := eth.GetLastBlockTag()
 	assert.NoError(t, err)
 	assert.NotEqual(t, 0, lastTag)
@@ -15,7 +20,10 @@ func TestGetLastTag(t *testing.T) {
 }
 
 func TestGetBlockByTag(t *testing.T) {
-	eth := New()
+	eth := New(Config{
+		RootAddress: "https://api.etherscan.io/api",
+		Module:      "proxy",
+	})
 	lastTag, err := eth.GetLastBlockTag()
 	assert.NoError(t, err)
 

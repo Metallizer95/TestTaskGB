@@ -6,15 +6,17 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 // TODO: Create config struct and config file
 
-type action string
-
 const (
-	BlockByTagAction   action = "eth_getBlockByNumber"
-	LastBlockTagAction action = "eth_blockNumber"
+	BlockByTagAction   string = "eth_getBlockByNumber"
+	LastBlockTagAction string = "eth_blockNumber"
+
+	NumberFreeRPS int64         = 5
+	RequestsDelay time.Duration = 300 * time.Millisecond
 )
 
 type Etherscan interface {
@@ -22,36 +24,27 @@ type Etherscan interface {
 	GetBlockByTag(tag int64) (EthModel, error)
 }
 
-type addressParameters struct {
-	module  string
-	action  action
-	tag     string
-	boolean string
-	apikey  string
-}
-
-type etherscan struct {
+type etherScan struct {
 	rootAddress string
-	params      addressParameters
+	apiKey      string
+	module      string
 }
 
-func New() Etherscan {
-	return etherscan{
-		rootAddress: "https://api.etherscan.io/api",
-		params: addressParameters{
-			module:  "proxy",
-			action:  "",
-			tag:     "",
-			boolean: "true", // transaction details visible
-			apikey:  "JPXGPM5DID3KFD3VH77TKI2RCU7Q3GMYPT",
-		},
+func New(cfg Config) Etherscan {
+	return etherScan{
+		rootAddress: cfg.RootAddress,
+		apiKey:      cfg.ApiKey,
+		module:      cfg.Module,
 	}
 }
 
-func (e etherscan) GetLastBlockTag() (int64, error) {
-	e.params.action = LastBlockTagAction
-
-	address := e.getRequestAddress()
+func (e etherScan) GetLastBlockTag() (int64, error) {
+	address := fmt.Sprintf("%s?module=%s&action=%s&apikey=%s",
+		e.rootAddress,
+		e.module,
+		LastBlockTagAction,
+		e.apiKey,
+	)
 	resp, err := http.Get(address)
 	if err != nil {
 		return 0, err
@@ -77,12 +70,16 @@ func (e etherscan) GetLastBlockTag() (int64, error) {
 	return tagInt, nil
 }
 
-func (e etherscan) GetBlockByTag(tag int64) (EthModel, error) {
-	e.params.action = BlockByTagAction
-	e.params.tag = "0x" + strconv.FormatInt(tag, 16)
+func (e etherScan) GetBlockByTag(tag int64) (EthModel, error) {
+	hexTag := "0x" + strconv.FormatInt(tag, 16)
 
-	address := e.getRequestAddress()
-	fmt.Println(address)
+	address := fmt.Sprintf("%s?module=%s&action=%s&tag=%s&boolean=true&apikey=%s",
+		e.rootAddress,
+		e.module,
+		BlockByTagAction,
+		hexTag,
+		e.apiKey,
+	)
 	resp, err := http.Get(address)
 	if err != nil {
 		return EthModel{}, err
@@ -101,28 +98,4 @@ func (e etherscan) GetBlockByTag(tag int64) (EthModel, error) {
 	}
 
 	return responseModel, nil
-}
-
-func (e etherscan) getRequestAddress() string {
-	var result string
-	if e.params.action == BlockByTagAction {
-		result = fmt.Sprintf(
-			"%s?module=%s&action=%s&tag=%s&boolean=%s&apikey=%s",
-			e.rootAddress,
-			e.params.module,
-			e.params.action,
-			e.params.tag,
-			e.params.boolean,
-			e.params.apikey,
-		)
-	} else {
-		result = fmt.Sprintf(
-			"%s?module=%s&action=%s&apikey=%s",
-			e.rootAddress,
-			e.params.module,
-			e.params.action,
-			e.params.apikey,
-		)
-	}
-	return result
 }
