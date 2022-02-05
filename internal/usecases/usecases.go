@@ -3,6 +3,7 @@ package usecases
 import (
 	"github.com/Metallizer95/TestTaskGB/internal/domain"
 	"github.com/Metallizer95/TestTaskGB/pkg/etherscan"
+	"github.com/cheggaaa/pb/v3"
 	"math/big"
 	"sort"
 	"time"
@@ -28,6 +29,8 @@ func (uc useCasesImpl) FindMaxBalanceWalletForLastBlocks(numberBlocks int64) (wb
 	holders := domain.NewHolders()
 
 	// Do not use goroutines because RPS is restricted (only 5 per second for free version)
+	bar := pb.StartNew(int(numberBlocks))
+	defer bar.Finish()
 	for i := lastBlock; i > lastBlock-numberBlocks; i-- {
 		if i%etherscan.NumberFreeRPS == 0 && i != 0 {
 			time.Sleep(etherscan.RequestsDelay)
@@ -44,6 +47,7 @@ func (uc useCasesImpl) FindMaxBalanceWalletForLastBlocks(numberBlocks int64) (wb
 			holders.AddValue(t.ReceiverAddress, val)
 			holders.SubValue(t.SenderAddress, -val)
 		}
+		bar.Increment()
 	}
 	return uc.getWalletMaxProfit(holders), errs
 }
