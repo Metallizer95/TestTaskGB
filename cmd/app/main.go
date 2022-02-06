@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"github.com/Metallizer95/TestTaskGB/internal/usecases"
 	"github.com/Metallizer95/TestTaskGB/pkg/etherscan"
-	"gopkg.in/yaml.v3"
-	"io/ioutil"
 	"log"
 )
 
@@ -18,19 +16,14 @@ func init() {
 }
 
 func main() {
-	cfgFile, err := ioutil.ReadFile(ethConfigPath)
+	ethCfg, err := etherscan.NewConfig(ethConfigPath)
 	if err != nil {
-		log.Fatalf("Failed to read config file: %v", err)
-	}
-
-	var ethCfg etherscan.Config
-	err = yaml.Unmarshal(cfgFile, &ethCfg)
-	if err != nil {
-		log.Fatalf("Failed to parse config file: %v", err)
+		log.Fatal(err)
 	}
 
 	ucs := usecases.New(etherscan.New(ethCfg))
-	res, errs := ucs.FindMaxBalanceWalletForLastBlocks(100)
+	res, errs := ucs.FindMaxProfitWalletForLastBlocks(100)
+
 	fmt.Printf("Top holder: %s\nHis profit: %e wei", res.Address, res.Value)
 	if len(errs.Errs) != 0 {
 		fmt.Printf("Errors: %+v", errs)

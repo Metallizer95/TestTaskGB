@@ -1,34 +1,44 @@
 package etherscan
 
 import (
-	"fmt"
 	"github.com/stretchr/testify/assert"
+	"os"
+	"strings"
 	"testing"
 )
 
-// Do not use api key in tests, so may occurred error related with limit of requests
+var cfg Config
+
+func TestMain(t *testing.M) {
+	fullPath, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	sepPath := strings.Split(fullPath, "/")
+	rootPath := strings.Join(sepPath[:len(sepPath)-2], "/")
+
+	configPath := rootPath + "/ethConfig.yml"
+	
+	cfg, err = NewConfig(configPath)
+	if err != nil {
+		panic(err)
+	}
+
+	t.Run()
+}
 
 func TestGetLastTag(t *testing.T) {
-	eth := New(Config{
-		RootAddress: "https://api.etherscan.io/api",
-		Module:      "proxy",
-	})
+	eth := New(cfg)
 	lastTag, err := eth.GetLastBlockTag()
 	assert.NoError(t, err)
 	assert.NotEqual(t, 0, lastTag)
-	fmt.Println(lastTag)
 }
 
 func TestGetBlockByTag(t *testing.T) {
-	eth := New(Config{
-		RootAddress: "https://api.etherscan.io/api",
-		Module:      "proxy",
-	})
+	eth := New(cfg)
 	lastTag, err := eth.GetLastBlockTag()
 	assert.NoError(t, err)
 	block, err := eth.GetBlockByTag(lastTag)
 	assert.NoError(t, err)
 	assert.NotEqual(t, EthModel{}, block)
-
-	fmt.Println(block.Result.Transactions)
 }

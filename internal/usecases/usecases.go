@@ -20,7 +20,7 @@ func New(eth etherscan.Etherscan) UseCases {
 	}
 }
 
-func (uc useCasesImpl) FindMaxBalanceWalletForLastBlocks(numberBlocks int64) (wb WalletBalanceModel, errs ErrorModel) {
+func (uc useCasesImpl) FindMaxProfitWalletForLastBlocks(numberBlocks int64) (wb WalletBalanceModel, errs ErrorModel) {
 	lastBlock, err := uc.EthScanService.GetLastBlockTag()
 	if err != nil {
 		errs.Append(err)

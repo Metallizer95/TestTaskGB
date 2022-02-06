@@ -1,5 +1,5 @@
 package usecases
 
 type UseCases interface {
-	FindMaxBalanceWalletForLastBlocks(numberBlocks int64) (WalletBalanceModel, ErrorModel)
+	FindMaxProfitWalletForLastBlocks(numberBlocks int64) (WalletBalanceModel, ErrorModel)
 }
