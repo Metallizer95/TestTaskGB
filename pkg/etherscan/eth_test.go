@@ -26,7 +26,6 @@ func TestGetBlockByTag(t *testing.T) {
 	})
 	lastTag, err := eth.GetLastBlockTag()
 	assert.NoError(t, err)
-
 	block, err := eth.GetBlockByTag(lastTag)
 	assert.NoError(t, err)
 	assert.NotEqual(t, EthModel{}, block)

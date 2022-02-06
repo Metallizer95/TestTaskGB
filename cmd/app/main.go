@@ -30,6 +30,9 @@ func main() {
 	}
 
 	ucs := usecases.New(etherscan.New(ethCfg))
-	res, _ := ucs.FindMaxBalanceWalletForLastBlocks(20)
-	fmt.Println(res)
+	res, errs := ucs.FindMaxBalanceWalletForLastBlocks(100)
+	fmt.Printf("Top holder: %s\nHis profit: %e wei", res.Address, res.Value)
+	if len(errs.Errs) != 0 {
+		fmt.Printf("Errors: %+v", errs)
+	}
 }

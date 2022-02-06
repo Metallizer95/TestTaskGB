@@ -4,6 +4,7 @@ import (
 	"github.com/Metallizer95/TestTaskGB/internal/domain"
 	"github.com/Metallizer95/TestTaskGB/pkg/etherscan"
 	"github.com/cheggaaa/pb/v3"
+	"log"
 	"math/big"
 	"sort"
 	"time"
@@ -37,7 +38,7 @@ func (uc useCasesImpl) FindMaxBalanceWalletForLastBlocks(numberBlocks int64) (wb
 		}
 		iBlock, err := uc.EthScanService.GetBlockByTag(i)
 		if err != nil {
-			errs.Append(err)
+			log.Printf("%d-iteration failed: %v", i, err)
 			continue
 		}
 

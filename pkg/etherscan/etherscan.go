@@ -9,14 +9,12 @@ import (
 	"time"
 )
 
-// TODO: Create config struct and config file
-
 const (
 	BlockByTagAction   string = "eth_getBlockByNumber"
 	LastBlockTagAction string = "eth_blockNumber"
 
-	NumberFreeRPS int64         = 5
-	RequestsDelay time.Duration = 300 * time.Millisecond
+	NumberFreeRPS int64 = 5
+	RequestsDelay       = 300 * time.Millisecond
 )
 
 type Etherscan interface {
