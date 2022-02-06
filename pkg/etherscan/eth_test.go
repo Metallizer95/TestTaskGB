@@ -18,7 +18,7 @@ func TestMain(t *testing.M) {
 	rootPath := strings.Join(sepPath[:len(sepPath)-2], "/")
 
 	configPath := rootPath + "/ethConfig.yml"
-	
+
 	cfg, err = NewConfig(configPath)
 	if err != nil {
 		panic(err)
